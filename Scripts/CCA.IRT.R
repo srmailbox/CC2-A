@@ -4,12 +4,12 @@
 #
 # this script tries to identify existing items that might be suitable.
 
+include(psych);include(ggmirt)
 include(readxl);include(dplyr);include(ggplot2);include(gridExtra)
-include(psych)
 
 # 1.0 - read the CC2-A norming data in ####
 
-ccA = read_xlsx("MASTER_FINAL_DECEMBER 2017_Data_entry_spreadsheets.SR.xlsx", sheet = "CC2-A_FOR.R"
+ccA.raw = read_xlsx("MASTER_FINAL_DECEMBER 2017_Data_entry_spreadsheets.SR.xlsx", sheet = "CC2-A_FOR.R"
                  , na = c("NA", "n/a")) %>% 
   rename(Age = `Age (months)`, sID = `SUBJECT CODE`)
 ccA.items = read_xlsx("MASTER_FINAL_DECEMBER 2017_Data_entry_spreadsheets.SR.xlsx"
@@ -25,9 +25,11 @@ if(FALSE){
 # so no other clean up.
 
 # replace columns with actual items
+# Need to order the items by Item num rather than grouped by type
 ccA.items$ItemLbl = paste0("Item.", ccA.items$ItemID)
-ccA = ccA %>% select(1:12, all_of(ccA.items$ItemLbl))
-colnames(ccA)[13:ncol(ccA)]=ccA.items$Item
+ccA = ccA.raw %>% select(sID, Grade, Age, all_of(ccA.items$ItemLbl)) %>% data.frame
+colnames(ccA)[4:(ncol(ccA))]=ccA.items$Item
+ccA = ccA %>% select(1:12, all_of(ccA.items$Item))
 
 ## 1.1 split by item type ####
 
@@ -42,11 +44,27 @@ ccA.nw = ccA %>%
 # Alright let's look at the two item types and see what our IRT gives us
 
 ## 2.1 Irregs ####
-ccA.irr.irt = irt.fa(ccA.irr %>% select(-c(1:3)) %>% 
-                     drop_na() %>% data.frame, 10)
+# give has perfect accuracy, and so can't be used here.
+
+ccA.irr.irt = mirt(ccA.irr %>% select(-c(1:3), -give) %>% drop_na
+                   , model = 1
+                   , itemtype="2PL")
+cca.irr.irtfa = irt.fa(ccA.irr %>% 
+                         select(ccA.items$Item[ccA.items$ItemType=="Irregular"]
+                                , -give)
+                       , 1)
 
 ## 2.2 Nonwords ####
 
-## 2.1 Irregs ####
-ccA.nw.irt = irt.fa(ccA.nw %>% select(-c(1:3)) %>% 
-                       drop_na() %>% data.frame, 1)
+ccA.nw.irt = mirt(ccA.nw %>% select(-c(1:3))
+                  , model = 2, itemtype="2PL")
+
+ccA.nw.irtfa = irt.fa(ccA.nw %>% select(-c(1:3))
+                  , 1)
+# 3.0 Factor Analysis ####
+# The IRT seems to suggest that different factors are involved here. Let's
+# take a closer look at that.
+
+## 3.1 Irregs ####
+
+ccA.irr.fa = factanal(ccA.irr %>% select(-c(1:3)) %>% drop_na,14)
