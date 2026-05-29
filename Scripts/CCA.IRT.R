@@ -4,7 +4,7 @@
 #
 # this script tries to identify existing items that might be suitable.
 
-include(psych);include(ggmirt)
+include(psych);include(mirt);include(ggmirt)
 include(readxl);include(dplyr);include(ggplot2);include(gridExtra)
 
 # 1.0 - read the CC2-A norming data in ####
@@ -49,7 +49,9 @@ ccA.nw = ccA %>%
 ccA.irr.irt = mirt(ccA.irr %>% select(-c(1:3), -give) %>% drop_na
                    , model = 1
                    , itemtype="2PL")
-cca.irr.irtfa = irt.fa(ccA.irr %>% 
+
+
+ccA.irr.irtfa = irt.fa(ccA.irr %>% 
                          select(ccA.items$Item[ccA.items$ItemType=="Irregular"]
                                 , -give)
                        , 1)
@@ -57,10 +59,13 @@ cca.irr.irtfa = irt.fa(ccA.irr %>%
 ## 2.2 Nonwords ####
 
 ccA.nw.irt = mirt(ccA.nw %>% select(-c(1:3))
-                  , model = 2, itemtype="2PL")
+                  , model = 1, itemtype="2PL")
 
 ccA.nw.irtfa = irt.fa(ccA.nw %>% select(-c(1:3))
                   , 1)
+
+ccA.nw.irtfa$irt$discrimination
+
 # 3.0 Factor Analysis ####
 # The IRT seems to suggest that different factors are involved here. Let's
 # take a closer look at that.
