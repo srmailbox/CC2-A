@@ -76,3 +76,44 @@ ccA.nw.irtInfo = plot(ccA.nw.irtfa)
 ## 3.1 Irregs ####
 
 ccA.irr.fa = factanal(ccA.irr %>% select(-c(1:3)) %>% drop_na,14)
+
+# 4.0 Drop low discrimination items - IRR ####
+# Many irregular items have extremely poor discrimination, often due to very 
+# high (or low) accuracy.
+# These items have discriminations less than .3
+
+lowDisc = read_lines('eye
+couple
+good
+friend
+blood
+come
+soul
+work
+shoe
+island
+sure
+cough
+break
+ceiling
+iron
+routine
+bowl
+tomb
+wolf
+deaf
+choir
+shove
+yacht
+lose
+bouquet
+crêpe
+meringue
+cello
+genre
+depot
+brooch')
+
+## 4.1 refit IRT ####
+ccA.irr.restricted = irt.fa(ccA.irr %>% select(-c(1:3),-all_of(lowDisc))
+                      , 1)
