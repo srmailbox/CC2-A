@@ -55,6 +55,8 @@ ccA.irr.irtfa = irt.fa(ccA.irr %>%
                          select(ccA.items$Item[ccA.items$ItemType=="Irregular"]
                                 , -give)
                        , 1)
+ccA.irr.irtInfo = plot(ccA.irr.irtfa, cut=0)
+cbind(ccA.irr.irtfa$irt$difficulty[[1]], ccA.irr.irtfa$irt$discrimination)
 
 ## 2.2 Nonwords ####
 
@@ -66,6 +68,7 @@ ccA.nw.irtfa = irt.fa(ccA.nw %>% select(-c(1:3))
 
 ccA.nw.irtfa$irt$discrimination
 
+ccA.nw.irtInfo = plot(ccA.nw.irtfa)
 # 3.0 Factor Analysis ####
 # The IRT seems to suggest that different factors are involved here. Let's
 # take a closer look at that.
