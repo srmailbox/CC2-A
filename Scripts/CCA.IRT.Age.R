@@ -75,3 +75,33 @@ grid.arrange(
 ## 2.1 by Grade ####
 ## There aren't enough kids in each grade to comfortably fit them separately
 ## So I'll do this by combining grades 6/7, 8/9, and 10/11
+
+ccA.nw = ccA.nw %>% 
+  mutate(GradeGrp = factor(floor(Grade/2)*2+.5))
+ccA.irr = ccA.irr %>% 
+  mutate(GradeGrp = factor(floor(Grade/2)*2+.5))
+
+ccA.nw.grade=by(ccA.nw, ccA.nw$GradeGrp
+   , function(x) irt.fa(x %>% select(-Grade,-Age,-sID,-GradeGrp), 1))
+
+ccA.irr.grade=by(ccA.irr, ccA.irr$GradeGrp
+                , function(x) irt.fa(x %>% select(-Grade,-Age,-sID,-GradeGrp
+                                                  , -give), 1))
+
+
+ccA.irr.grade.discs =
+  merge(ccA.irr.grade$`6.5`$irt$discrimination
+        , ccA.irr.grade$`8.5`$irt$discrimination
+        , by="row.names", all=T, suffixes=c("6.5", "8.5")) %>% 
+  merge(ccA.irr.grade$`10.5`$irt$discrimination
+        , by="row.names", all=T, by.x="Row.names", by.y="row.names") %>% 
+  rename(MR10.5 = MR1)
+
+
+ccA.nw.grade.discs =
+  merge(ccA.nw.grade$`6.5`$irt$discrimination
+        , ccA.nw.grade$`8.5`$irt$discrimination
+        , by="row.names", all=T, suffixes=c("6.5", "8.5")) %>% 
+  merge(ccA.nw.grade$`10.5`$irt$discrimination
+        , by="row.names", all=T, by.x="Row.names", by.y="row.names") %>% 
+  rename(MR10.5 = MR1)
